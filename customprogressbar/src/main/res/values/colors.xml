@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+
+    <!--Score View Progress-->
+    <color name="dark_teal">#20837f</color>
+    <color name="cloud_progress_get_started_bg_color">#c5c0c0</color>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_small">3dp</dimen>
+    <dimen name="margin_medium">5dp</dimen>
+    <dimen name="margin_large">8dp</dimen>
+    <dimen name="margin_xlarge">12dp</dimen>
+    <dimen name="margin_xxlarge">37dp</dimen>
+    <dimen name="margin_xxxlarge">72dp</dimen>
+
+    <dimen name="progress_circle_radius">4dp</dimen>
+    <dimen name="text_size_progress_percentage">50sp</dimen>
+    <dimen name="text_size_static_score">17sp</dimen>
+    <dimen name="text_size_completed">20sp</dimen>
+    <dimen name="progress_circle_h_w">100dp</dimen>
+    <dimen name="text_size_progress_circle">40sp</dimen>
+</resources>

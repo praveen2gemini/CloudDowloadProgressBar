@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cloud_progressbar="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/holo_green_dark"
+        android:padding="@dimen/margin_large">
+
+        <com.dpdlad.customprogressbar.DownloadProgressBar
+            android:id="@+id/animated_cloud_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            cloud_progressbar:max="100"
+            cloud_progressbar:primary_progress_color="@android:color/white"
+            cloud_progressbar:progress_background_color="@android:color/black"
+            cloud_progressbar:progress_text_color="@android:color/white"
+            cloud_progressbar:secondary_progress_color="@color/cloud_progress_get_started_bg_color" />
+
+    </FrameLayout>
+</RelativeLayout>
