@@ -1,6 +1,7 @@
 package dpdlad.com.clouddowloadprogressbar;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.IntRange;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -8,18 +9,26 @@ import android.view.View;
 
 import com.dpdlad.customprogressbar.DownloadProgressBar;
 
+/**
+ * @author Praveen Kumar updated on 23 Nov 2018
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int THREAD_DELAYED_TIME = 300;
-    private DownloadProgressBar cloudProgressBar;
     private int mCounter = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        cloudProgressBar = findViewById(R.id.animated_cloud_progressbar);
-        cloudProgressBar.setOnClickListener(this);
+        initViewWithListener(R.id.animated_cloud_progressbar1,
+                R.id.animated_cloud_progressbar2,
+                R.id.animated_cloud_progressbar3);
+    }
+
+    private void initViewWithListener(@IdRes int... animated_cloud_progressbarIds) {
+        for (int animated_cloud_progressbarId : animated_cloud_progressbarIds)
+            findViewById(animated_cloud_progressbarId).setOnClickListener(this);
     }
 
     @Override
@@ -27,18 +36,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
     }
 
-    private void startProgressDemo() {
+    /**
+     * It is just demo purpose created {@link Runnable} for update the progress value every seconds.
+     *
+     * @param cloudProgressBar
+     */
+    private void startProgressDemo(final DownloadProgressBar cloudProgressBar) {
         if (mCounter == -1) {
             cloudProgressBar.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    cloudProgressBar.post(getProgressRunnable(mCounter));
+                    cloudProgressBar.clearAnimation();
+                    cloudProgressBar.post(getProgressRunnable(cloudProgressBar, mCounter));
                 }
             }, 3000);
+            cloudProgressBar.startBlink();
         }
     }
 
-    private Runnable getProgressRunnable(@IntRange(from = 0, to = 100) final int progress) {
+    private Runnable getProgressRunnable(final DownloadProgressBar cloudProgressBar, @IntRange(from = 0, to = 100) final int progress) {
         return new Runnable() {
             @Override
             public void run() {
@@ -47,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cloudProgressBar.setProgress(progress);
                     Log.e("###############", "mCounter: " + mCounter);
                     mCounter++;
-                    cloudProgressBar.postDelayed(getProgressRunnable(mCounter), THREAD_DELAYED_TIME);
+                    cloudProgressBar.postDelayed(getProgressRunnable(cloudProgressBar, mCounter), THREAD_DELAYED_TIME);
                 } else {
                     mCounter = -1;
                     cloudProgressBar.reset();
@@ -60,6 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        startProgressDemo();
+        startProgressDemo((DownloadProgressBar) v);
     }
 }

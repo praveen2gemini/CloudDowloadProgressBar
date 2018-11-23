@@ -5,6 +5,9 @@
         <attr name="secondary_progress_color" format="color" />
         <attr name="progress_background_color" format="color" />
         <attr name="progress_text_color" format="color" />
+        <attr name="download_icon" format="integer" />
+        <attr name="show_percentage" format="boolean" />
+        <attr name="show_indicator" format="boolean" />
         <attr name="max" format="integer" />
         <attr name="progress" format="integer" />
     </declare-styleable>

@@ -20,19 +20,22 @@ import android.support.annotation.Nullable;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import java.security.InvalidParameterException;
 
 /**
  * @author Praveen Kumar on 26/06/2017
  */
-
 public class DownloadProgressBar extends View {
 
     //Default max sweep angle
     private static final int DEFAULT_MAX_SWEEP_ANGLE = 360;
+
+    //Deafult View top origin
+    private static final int DEFAULT_ORIGIN_TOP = 40;
 
     private static final int MINIMUM_MARGIN_ADJUSTMENT = 3;
     private static final int PROGRESS_STARTING_ANGLE = 270; // By default start angle is 270 degree
@@ -57,8 +60,12 @@ public class DownloadProgressBar extends View {
     private int progressPercentageTextColor;
     @ColorInt
     private int progressBackgroundColor;
+    private Drawable downloadDrawable;
+    private boolean showDownloadPercentage, showDownloadIndicator;
     private int progress = 0;
     private int maximumProgress = 100; //By default 100
+
+    private int randomAlpha = 0;
 
     public DownloadProgressBar(Context context) {
         this(context, null);
@@ -78,6 +85,31 @@ public class DownloadProgressBar extends View {
         reset(); // Reset the all values
     }
 
+    @Nullable
+    public Drawable getDownloadDrawable() {
+        return downloadDrawable;
+    }
+
+    public void setDownloadDrawable(@Nullable Drawable downloadDrawable) {
+        this.downloadDrawable = downloadDrawable;
+    }
+
+    public boolean isShowDownloadPercentage() {
+        return showDownloadPercentage;
+    }
+
+    public void setShowDownloadPercentage(boolean showDownloadPercentage) {
+        this.showDownloadPercentage = showDownloadPercentage;
+    }
+
+    public boolean isShowDownloadIndicator() {
+        return showDownloadIndicator;
+    }
+
+    public void setShowDownloadIndicator(boolean showDownloadIndicator) {
+        this.showDownloadIndicator = showDownloadIndicator;
+    }
+
     private void loadAttributes(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         TypedArray attributes = context.getTheme()
                 .obtainStyledAttributes(attrs, R.styleable.BubbledProgressBar, defStyleAttr, 0);
@@ -91,6 +123,10 @@ public class DownloadProgressBar extends View {
                 ContextCompat.getColor(getContext(), android.R.color.black));
         progress = attributes.getInt(R.styleable.BubbledProgressBar_progress, 0);
         maximumProgress = attributes.getInt(R.styleable.BubbledProgressBar_max, 100);
+
+        downloadDrawable = attributes.getDrawable(R.styleable.BubbledProgressBar_download_icon);
+        showDownloadIndicator = attributes.getBoolean(R.styleable.BubbledProgressBar_show_indicator, true);
+        showDownloadPercentage = attributes.getBoolean(R.styleable.BubbledProgressBar_show_percentage, true);
 
         //Text Color
         progressPercentageTextColor = attributes.getColor(R.styleable.BubbledProgressBar_progress_text_color,
@@ -106,6 +142,10 @@ public class DownloadProgressBar extends View {
         this.primaryProgressBarColor = primaryProgressBarColor;
     }
 
+    public int getSecondaryProgressBarColor() {
+        return secondaryProgressBarColor;
+    }
+
     /**
      * It sets unanimated progress color
      *
@@ -113,10 +153,6 @@ public class DownloadProgressBar extends View {
      */
     public void setSecondaryProgressBarColor(int secondaryProgressBarColor) {
         this.secondaryProgressBarColor = secondaryProgressBarColor;
-    }
-
-    public int getSecondaryProgressBarColor() {
-        return secondaryProgressBarColor;
     }
 
     /**
@@ -157,10 +193,6 @@ public class DownloadProgressBar extends View {
             minimumSize = res.getDimensionPixelSize(R.dimen.progress_circle_h_w);
         }
 //        setMeasuredDimension(minimumSize, minimumSize);
-
-//        int desiredWidth = 100;
-//        int desiredHeight = 100;
-
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -197,7 +229,7 @@ public class DownloadProgressBar extends View {
         setMeasuredDimension(width, height);
     }
 
-    private void drawCrossOnView(Canvas canvas) {
+    private void drawCrossOnView(@NonNull Canvas canvas) {
         Paint paint = getDefaultPaint(Paint.Style.STROKE);
         paint.setColor(Color.RED);
         paint.setStrokeWidth(2);
@@ -212,24 +244,36 @@ public class DownloadProgressBar extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.TRANSPARENT); // Background color
-        drawProgressiveArc(canvas);
+    protected void onDraw(@NonNull Canvas canvas) {
+        canvas.drawColor(Color.TRANSPARENT); // Background color as TRANSPARENT
+            drawProgressiveArc(canvas);
         drawFilledStrokedCircle(canvas);
         if (progress >= 0) {
-            drawScoreAndPercentageCharacter(canvas);
+            if (showDownloadPercentage) {
+                drawScoreAndPercentageCharacter(canvas);
+            }
+
         } else {
             drawImage(canvas);
         }
-//        drawCrossOnView(canvas);
+//        drawCrossOnView(canvas); // For development purpose only enable it
         super.onDraw(canvas);
     }
 
+    public void startBlink() {
+        Animation animBlink = AnimationUtils.loadAnimation(getContext(),
+                R.anim.blinkable);
 
-    private void drawImage(Canvas canvas) {
+        startAnimation(animBlink);
+    }
+
+
+    private void drawImage(@NonNull Canvas canvas) {
         Resources res = getResources();
-        Drawable drawable = VectorDrawableCompat.create(res, R.drawable.ic_cloud_download, getContext().getTheme());
-        Bitmap bitmap = getBitmapFromDrawable(drawable);
+        if (null == downloadDrawable) {
+            downloadDrawable = VectorDrawableCompat.create(res, R.drawable.ic_cloud_download, getContext().getTheme());
+        }
+        Bitmap bitmap = getBitmapFromDrawable(downloadDrawable);
         if (null != bitmap) {
 
             float optimizedCenterValue = getArcCenterValue(); // Find center of the circle
@@ -277,6 +321,7 @@ public class DownloadProgressBar extends View {
         return optimizeValue / 2;
     }
 
+
     /**
      * It draws the progressive arc
      *
@@ -286,13 +331,15 @@ public class DownloadProgressBar extends View {
         if (progressiveCircleRect.isEmpty()) {
             progressiveCircleRect.set(
                     circleStrokeWidth, // left
-                    getTop() - circleStrokeWidth, //top
+                    DEFAULT_ORIGIN_TOP - circleStrokeWidth, //top
                     getWidth() - circleStrokeWidth, // right
-                    getWidth() - circleStrokeWidth // bottom
+                    getHeight() - circleStrokeWidth // bottom
             );
         }
-        canvas.drawArc(progressiveCircleRect, 0, DEFAULT_MAX_SWEEP_ANGLE, true, nonProgressiveArcPaint);
-        canvas.drawArc(progressiveCircleRect, PROGRESS_STARTING_ANGLE, mAnimatingSweepAngle, false, progressiveArcPaint);
+        if (showDownloadIndicator) {
+            canvas.drawArc(progressiveCircleRect, 0, DEFAULT_MAX_SWEEP_ANGLE, true, nonProgressiveArcPaint);
+            canvas.drawArc(progressiveCircleRect, PROGRESS_STARTING_ANGLE, mAnimatingSweepAngle, false, progressiveArcPaint);
+        }
     }
 
 

@@ -3,5 +3,15 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="card_bg">#ffdab9</color>
+    <color name="card_bg">#66ffdab9</color>
+
+
+    <!--progress color codes-->
+    <color name="green_dark">#23caba</color>
+    <color name="green_light">#6623caba</color>
+    <color name="red_dark">#990000</color>
+    <color name="red_light">#66990000</color>
+    <color name="purple_dark">#caa3ff</color>
+    <color name="purple_light">#66caa3ff</color>
+
 </resources>
