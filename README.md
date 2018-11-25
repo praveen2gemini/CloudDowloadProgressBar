@@ -1,6 +1,4 @@
 
-This is simple application used to understand the custom progress indicator for download any items. Also you can use this to show the status in percentage.
-If you don’t want to show progress indicator you can disable it and it will show percentage text only. Vice versa also possible in this component.
 
 This is open source. If anyone wants to customise it. You’re welcome!!!!
 
